@@ -3,4 +3,5 @@
 - name: Converge
   hosts: all
   roles:
-    - role: ROLE_NAME
+    - role: amazon_inspector_agent
+      sansible_amazon_inspector_agent_download_only: yes

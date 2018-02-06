@@ -1,0 +1,58 @@
+---
+
+- name: Download Amazon Inspector Agent Installer
+  become: yes
+  get_url:
+    url: "{{ sansible_amazon_inspector_agent_url }}"
+    dest: "{{ sansible_amazon_inspector_agent_dest }}"
+    mode: 0755
+
+- name: Download Amazon Inspector Agent Installer GPG Signature
+  become: yes
+  get_url:
+    url: "{{ sansible_amazon_inspector_agent_url }}.sig"
+    dest: "{{ sansible_amazon_inspector_agent_dest }}.sig"
+    mode: 0644
+
+- name: Copy Amazon Inspector GPG Public Key
+  become: yes
+  copy:
+    src: inspector.key
+    dest: "{{ sansible_amazon_inspector_agent_dest }}.key"
+    mode: 0644
+  register: inspector_key
+
+- name: Ensure Amazon Inspector GPG Public Key Checksum
+  assert:
+    that:
+      - "inspector_key.checksum == '{{ sansible_amazon_inspector_key_sha1sum }}'"
+
+- name: Import Amazon Inspector GPG Public Key
+  become: yes
+  command: "gpg --import {{ sansible_amazon_inspector_agent_dest }}.key"
+  changed_when: no
+  register: key_import
+
+- name: Get Amazon Inspector GPG Public Key Fingerprint
+  become: yes
+  command: "gpg --with-colons --fingerprint {{ (key_import.stderr | regex_search('gpg: key ([0-9]+):', '\\1'))[0] }}"
+  changed_when: no
+  register: key_fingerprint
+
+- name: Ensure Amazon Inspector GPG Public Key Fingerprint
+  assert:
+    that:
+      - "'{{ sansible_amazon_inspector_key_fingerprint | replace(' ', '') }}' ==
+         '{{ (key_fingerprint.stdout | regex_search('fpr:{9}([0-9A-F]+):', '\\1'))[0] }}'"
+
+- name: Verify Amazon Inspector Agent Installer
+  become: yes
+  command: "gpg --verify {{ sansible_amazon_inspector_agent_dest }}.sig"
+  changed_when: no
+
+- name: Execute Amazon Inspector Agent Installer
+  become: yes
+  command: "{{ sansible_amazon_inspector_agent_dest }}"
+  args:
+    creates: "/etc/init.d/awsagent"
+  when: not sansible_amazon_inspector_agent_download_only

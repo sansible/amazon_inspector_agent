@@ -1,0 +1,10 @@
+---
+
+- name: Set Amazon Inspector Agent Service State
+  become: yes
+  service:
+    name: awsagent
+    state: "{{ sansible_amazon_inspector_agent_state }}"
+    enabled: "{{ sansible_amazon_inspector_agent_enabled }}"
+  when:
+    - not sansible_amazon_inspector_agent_download_only

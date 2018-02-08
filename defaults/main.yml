@@ -1,1 +1,11 @@
 ---
+
+sansible_amazon_inspector_agent_dest: /tmp/amazon_inspector_agent
+sansible_amazon_inspector_agent_download_only: no
+sansible_amazon_inspector_agent_enabled: yes
+sansible_amazon_inspector_agent_state: started
+sansible_amazon_inspector_agent_url: https://d1wk0tztpsntt1.cloudfront.net/linux/latest/install
+
+# Do not change anything below unless things change on Amazon's side!
+sansible_amazon_inspector_key_sha1sum: ccc63adda70e6391094507a64333c052848430d4
+sansible_amazon_inspector_key_fingerprint: DDA0 D4C5 10AE 3C20 6F46 6DC0 2474 0960 5836 0418
